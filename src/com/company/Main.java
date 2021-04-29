@@ -1,81 +1,136 @@
 package com.company;
 
-import java.util.ArrayList;
+import com.company.models.Options;
+import com.company.models.Questions;
+import com.company.models.Test;
+
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Main {
-
     public static void main(String[] args) {
 
-        List<SeedlingsInformation> seedlingsList = new ArrayList<>();
-        seedlingsList.add(new
-                SeedlingsInformation("Apple Jannat", 40, SeedlingTypes.WAX_WOOD, BirthplaceOfSeedling.KYRGYZSTAN, 120, List.of("Очень хорошо", "Отлично"), Certificate.CERTIFICATED));
-        seedlingsList.add(new
-                SeedlingsInformation("Early Apple Red", 35, SeedlingTypes.WAX_WOOD, BirthplaceOfSeedling.POLISH, 170, List.of("Средний хорошо", " не Отлично"), Certificate.CERTIFICATED));
-        seedlingsList.add(new
-                SeedlingsInformation("Early Apple Green", 35, SeedlingTypes.WAX_WOOD, BirthplaceOfSeedling.KYRGYZSTAN, 170, List.of("Удов", "Не знаю"), Certificate.NO_CERTIFICATED));
-        seedlingsList.add(new
-                SeedlingsInformation("Barhat Black", 10, SeedlingTypes.FLOWER, BirthplaceOfSeedling.OZBEKISTON, 40, List.of("Болот ", "Норма"), Certificate.NO_CERTIFICATED));
-        seedlingsList.add(new
-                SeedlingsInformation("Magia Black", 10, SeedlingTypes.FLOWER, BirthplaceOfSeedling.AMERICAN, 8, List.of("канча турат экен", "Кайду бул кочот"), Certificate.CERTIFICATED));
-        seedlingsList.add(new
-                SeedlingsInformation("Archa Usuruk", 250, SeedlingTypes.SPRUCE, BirthplaceOfSeedling.KYRGYZSTAN, 210, List.of("Где этот базар", "Адрес"), Certificate.CERTIFICATED));
-        seedlingsList.add(new
-                SeedlingsInformation("Pavlona", 7, SeedlingTypes.WOOD, BirthplaceOfSeedling.EUROPA, 7, List.of("В личку пишите", "Где это"), Certificate.NO_CERTIFICATED));
-        seedlingsList.add(new
-                SeedlingsInformation("Pavlona", 15, SeedlingTypes.WOOD, BirthplaceOfSeedling.EUROPA, 12, List.of("В личку пишите", "Где это"), Certificate.NO_CERTIFICATED));
+
+        Questions[] questions = new Questions[]{
+                new Questions(1, "Что такое Java", new Options[]{
+                        new Options(1, "Это язык программирвания", 1),
+                        new Options(2, "Не язык программирвания", 0),
+                        new Options(3, "Англис язык программирвания", 0),
+                        new Options(4, "Русский язык программирвания", 0),
+                }),
+
+                new Questions(2, "Что такое C#?", new Options[]{
+                        new Options(1, "Язык разработки", 1),
+                        new Options(2, "Не знаю", 0),
+                        new Options(3, "Игрвой язык", 0),
+                        new Options(4, "Немецкий язык", 0)
+                }),
+                new Questions(2, "Что такое C#?", new Options[]{
+                        new Options(1, "Язык разработки", 1),
+                        new Options(2, "Не знаю", 0),
+                        new Options(3, "Игрвой язык", 0),
+                        new Options(4, "Немецкий язык", 0)
+                }),
+
+                new Questions(3, "Что такое Python?", new Options[]{
+                        new Options(1, "Язык разработки", 1),
+                        new Options(2, "Змея", 0),
+                        new Options(3, "Язык змей", 0),
+                        new Options(4, "Немецкий язык", 0)
+                }),
+
+        };
+
+        Test[] acceptTest = {new Test(1, questions, "Exam", "12.02.2021", "Языки программирования")};
+
+//foreach печать
+        Arrays.stream(acceptTest)
+                .forEach(show -> System.out.println(show.getId() + "\n" + show.getTestName() + "\n" + show.getTestType() + "\n" + show.getCreateDate()));
 
 
-        System.out.println("Всего записей:" + seedlingsList.stream().count());
+//filter найти все правильные ответы
+        Arrays.stream(questions)
+                .filter(questions1 -> questions1.getOptions().getKey() == 1)
+                .forEach(s -> System.out.println(s.getId() + " \n" + s.getQuestion() + " \n" + s.getOptions()));
 
-        Optional<SeedlingsInformation> seedlingsInformationOptional = seedlingsList.stream().findFirst();
-        System.out.println("Первый запись =" + seedlingsInformationOptional.get());
+        //limit,
+        Arrays.stream(questions)
+                .limit(2)
+                .forEach(s -> System.out.println(s));
+
+        //sorted сортировка по id
+        List<Questions> questions1 = Arrays.stream(questions)
+                .sorted(Comparator.comparingInt(Questions::getId)).collect(Collectors.toList());
+        System.out.println(questions1);
 
 
-        boolean isAllHaveCertificate = seedlingsList.stream()
-                .allMatch(certif -> certif.getCertificate().equals(Certificate.CERTIFICATED));
-        if (isAllHaveCertificate) {
-            System.out.println("Все сертифицированы");
-        } else {
-            System.out.println("Не все сертифицированы");
-        }
+        //max найти самый длинный вопрос
+        Questions maxLengQues = Arrays.stream(questions)
+                .max(Comparator.comparing(Questions::getQuestion)).get();
+        System.out.println(maxLengQues);
 
-        System.out.println("-----------------------------anyMatch()");
-        int priceLimiter = 10;
-        boolean priceFilter = seedlingsList.stream()
-                .anyMatch(price -> price.getPrice() <= priceLimiter);
-        if (priceFilter) {
-            System.out.println("Найдены саженцы дешевле " + priceLimiter + " cом");
-            seedlingsList.stream()
-                    .filter(priceFiltered -> priceFiltered.getPrice() < priceLimiter)
-                    .forEach(show -> System.out.println("Название:" + show.getSeedlingName() + " | Цена:" + show.getPrice() + " | Сорт:" + show.getSeedlingTypes()));
-        } else {
-            System.out.println("Саженцы из " + BirthplaceOfSeedling.EUROPA + " нет");
-        }
 
-        System.out.println("-----------------------------noneMatch()");
-        int lifeSizeLimiter = 280;
-        boolean isLifeTimeFilter = seedlingsList.stream()
-                .noneMatch(liveSize -> liveSize.getSeedlingLifeTime() > lifeSizeLimiter);
-        if (isLifeTimeFilter) {
-            System.out.println("Не найден сорт саженца с сроком жизни :" + lifeSizeLimiter + " лет:(");
-        } else {
-            System.out.println("Найден сорт саженца с сроком жизни :" + lifeSizeLimiter + " лет:)");
-            seedlingsList.stream()
-                    .filter(filter -> filter.getSeedlingLifeTime() >= lifeSizeLimiter)
-                    .forEach(show -> System.out.println("Название:" + show.getSeedlingName() + " | Цена:" + show.getPrice() + " | Сорт:" + show.getSeedlingTypes() + " | Срок жизни:" + show.getSeedlingLifeTime() + " лет"));
-        }
+        //max найти самый короткий вопрос
+        Questions minLengQues = Arrays.stream(questions)
+                .min(Comparator.comparing(Questions::getQuestion)).get();
+        System.out.println(minLengQues);
 
-        System.out.println("--------------min-max");
-        System.out.println("Самый дорогой:");
-        Optional<SeedlingsInformation> expensiveSeed = seedlingsList.stream().max(Comparator.comparing(SeedlingsInformation::getPrice));
-        System.out.println("Название:" + expensiveSeed.get().getSeedlingName() + " | Цена:" + expensiveSeed.get().getPrice() + " сом");
-        System.out.println("Самый дешевый:");
-        Optional<SeedlingsInformation> notExpensiveSeed = seedlingsList.stream().min(Comparator.comparing(SeedlingsInformation::getPrice));
-        System.out.println("Название:" + notExpensiveSeed.get().getSeedlingName() + " | Цена:" + notExpensiveSeed.get().getPrice() + " сом");
+
+        //map плюсить 2 для каждого айди
+        Arrays.stream(questions)
+                .map(Questions::getId)
+                .mapToInt(s -> s + 2)
+                .forEach(show -> System.out.println(show));
+        //flatMap найти вопрос с  словом java
+
+        Arrays.stream(questions)
+                .flatMap(p -> Stream.of(String.format(p.getQuestion())))
+                .filter(s -> s.contains("Java"))
+                .forEach(f -> System.out.println(f));
+
+        //limit
+        Arrays.stream(questions)
+                .limit(2)
+                .forEach(s -> System.out.println(s));
+
+        //skip
+
+        Arrays.stream(questions)
+                .skip(2)
+                .forEach(s -> System.out.println(s));
+        //distinct
+        System.out.println("distinct-----");
+        Arrays.stream(questions)
+                .distinct()
+                .forEach(s-> System.out.println(s));
+        //peek
+        System.out.println("Peek");
+        Arrays.stream(questions)
+                .peek(s -> System.out.println(s.getQuestion()+" peeked"))
+                .forEach(s-> System.out.println(s.getQuestion()));
+        //count
+        long counter =  Arrays.stream(questions).count();
+        System.out.println(counter);
+
+        //anyMatch
+
+        boolean isTrue = Arrays.stream(questions)
+                .anyMatch(s-> s.getOptions().getKey()== 1);
+        System.out.println(isTrue);
+
+        ///allMatch,
+        boolean isJava = Arrays.stream(questions)
+                .allMatch(s-> s.getQuestion().contains("Java"));
+        System.out.println(isJava);
+        // noneMatch
+        boolean isAllPython = Arrays.stream(questions)
+                .noneMatch(s-> s.getQuestion().contains("Pon"));
+        System.out.println(isAllPython);
+
+
 
     }
 }
